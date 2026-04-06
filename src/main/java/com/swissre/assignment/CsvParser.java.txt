@@ -1,0 +1,41 @@
+package com.swissre.assignment.util;
+
+import com.swissre.assignment.model.Employee;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.stream.Stream;
+
+public class CsvParser {
+
+    public List<Employee> parse(Path filePath) throws IOException {
+        try (Stream<String> lines = Files.lines(filePath)) {
+            return lines
+                    // Skip the header row
+                    .skip(1)
+                    // Ignore empty lines
+                    .filter(line -> !line.trim().isEmpty())
+                    .map(this::parseLine)
+                    .toList();
+        }
+    }
+
+    private Employee parseLine(String line) {
+        String[] parts = line.split(",");
+        
+        int id = Integer.parseInt(parts[0].trim());
+        String firstName = parts[1].trim();
+        String lastName = parts[2].trim();
+        double salary = Double.parseDouble(parts[3].trim());
+        
+        // Handle the CEO who has no managerId (empty or missing)
+        Integer managerId = null;
+        if (parts.length > 4 && !parts[4].trim().isEmpty()) {
+            managerId = Integer.parseInt(parts[4].trim());
+        }
+
+        return new Employee(id, firstName, lastName, salary, managerId);
+    }
+}

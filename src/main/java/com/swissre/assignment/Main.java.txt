@@ -1,0 +1,36 @@
+package com.swissre.assignment;
+
+import com.swissre.assignment.model.Employee;
+import com.swissre.assignment.service.OrganizationAnalyzer;
+import com.swissre.assignment.util.CsvParser;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        if (args.length == 0) {
+            System.err.println("Please provide the path to the CSV file as an argument.");
+            System.exit(1);
+        }
+
+        Path filePath = Paths.get(args[0]);
+        CsvParser parser = new CsvParser();
+
+        try {
+            List<Employee> employees = parser.parse(filePath);
+            OrganizationAnalyzer analyzer = new OrganizationAnalyzer(employees);
+
+            System.out.println("--- Salary Analysis ---");
+            analyzer.analyzeSalaries();
+
+            System.out.println("\n--- Reporting Line Analysis ---");
+            analyzer.analyzeReportingLines();
+
+        } catch (Exception e) {
+            System.err.println("An error occurred while processing the file: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+}
